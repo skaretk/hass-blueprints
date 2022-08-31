@@ -1,0 +1,65 @@
+blueprint:
+  name: Heatit Z-Dim
+  description: This blueprint can be used for creation of a single automatization
+    for controlling whole Heatit Z-Dim.
+  domain: automation
+  input:
+    zdim_device_id:
+      name: Heatit Z-Dim
+      description: The Heatit Z-Dim to interract with
+      selector:
+        device:
+          integration: zwave_js
+          manufacturer: ThermoFloor
+          model: HeatIt ZDim
+    double_press:
+      name: Button Pressed 2 times
+      description: Action to run on button is pressed twice.
+      default:
+      selector:
+        action: {}      
+    triple_press:
+      name: Button Pressed 3 times
+      description: Action to run on button is pressed three times.
+      default:
+      selector:
+        action: {}
+    four_press:
+      name: Button Pressed 4 times
+      description: Action to run on button is pressed four times.
+      default:
+      selector:
+        action: {}
+    five_press:
+      name: Button Pressed 5 times
+      description: Action to run on button is pressed five times.
+      default:
+      selector:
+        action: {}
+
+mode: single
+trigger:
+- platform: event
+  event_type: zwave_js_value_notification
+  event_data:
+    device_id: !input "zdim_device_id"
+    command_class_name: Central Scene
+
+action:
+- variables:
+    button: "{{ trigger.event.data.property_key_name }}"
+    button_action: "{{ trigger.event.data.value }}"
+- choose:
+  - conditions: "{{ button == '001' and button_action == 'KeyPressed2x' }}"
+    sequence: !input "double_press"
+  - conditions: "{{ button == '001' and button_action == 'KeyPressed3x' }}"
+    sequence: !input "triple_press"
+  - conditions: "{{ button == '001' and button_action == 'KeyPressed4x' }}"
+    sequence: !input "four_press"
+  - conditions: "{{ button == '001' and button_action == 'KeyPressed5x' }}"
+    sequence: !input "five_press"
+  default:
+    - service: logbook.log
+      data:
+        name: Heatit Z-Dim
+        message: Unhandled event
