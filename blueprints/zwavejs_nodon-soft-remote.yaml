@@ -1,0 +1,160 @@
+blueprint:
+  name: Nodon Soft Remote
+  description: This blueprint can be used for creation of a single automatization
+    for controlling whole Nodon Soft Remote.
+  domain: automation
+  input:
+    nodon_soft_remote:
+      name: Nodon Soft Remote
+      description: The Nodon Soft Remote to interract with
+      selector:
+        device:
+          integration: zwave_js
+          manufacturer: ID-RF
+          model: Soft Remote
+    dot_pressed:
+      name: Dot Press
+      description: Action to run when dot button is pressed.
+      default:
+      selector:
+        action: {}
+    dot_pressed_double:
+      name: Dot Double Press
+      description: Action to run when dot button is pressed twice.
+      default:
+      selector:
+        action: {}
+    dot_pressed_long:
+      name: Dot Long Press
+      description: Action to run when dot button is held.
+      default:
+      selector:
+        action: {}
+    dot_pressed_long_release:
+      name: Dot Long Press Release
+      description: Action to run when dot button is released after long press.
+      default:
+      selector:      
+        action: {}
+    circle_pressed:
+      name: Circle Press
+      description: Action to run when circle button is pressed.
+      default:
+      selector:
+        action: {}
+    circle_pressed_double:
+      name: Circle Double Press
+      description: Action to run when circle button is pressed twice.
+      default:
+      selector:
+        action: {}
+    circle_pressed_long:
+      name: Circle Long Press
+      description: Action to run when circle button is held.
+      default:
+      selector:
+        action: {}
+    circle_pressed_long_release:
+      name: Circle Long Press Release
+      description: Action to run when circle button is released after long press.
+      default:
+      selector:
+        action: {}
+    plus_pressed:
+      name: Plus Press
+      description: Action to run when plus button is pressed.
+      default:
+      selector:
+        action: {}
+    plus_pressed_double:
+      name: Plus Double Press
+      description: Action to run when plus button is pressed twice.
+      default:
+      selector:
+        action: {}
+    plus_pressed_long:
+      name: Plus Long Press
+      description: Action to run when plus button is held.
+      default:
+      selector:
+        action: {}
+    plus_pressed_long_release:
+      name: Plus Long Press Release
+      description: Action to run when plus button is released after long press.
+      default:
+      selector:
+        action: {}
+    minus_pressed:
+      name: Minus Press
+      description: Action to run when minus button is pressed.
+      default:
+      selector:
+        action: {}
+    minus_pressed_double:
+      name: Minus Double Press
+      description: Action to run when minus button is pressed twice.
+      default:
+      selector:
+        action: {}
+    minus_pressed_long:
+      name: Minus Long Press
+      description: Action to run when minus button is held.
+      default:
+      selector:
+        action: {}
+    minus_pressed_long_release:
+      name: Minus Long Press Release
+      description: Action to run when minus button is released after long press.
+      default:
+      selector:
+        action: {}
+      
+mode: single
+trigger:
+- platform: event
+  event_type: zwave_js_value_notification
+  event_data:
+    device_id: !input 'nodon_soft_remote'
+    command_class_name: Central Scene
+action:
+- variables:
+    button: "{{ trigger.event.data.property_key }}"
+    button_action: "{{ trigger.event.data.value }}"
+- choose:
+  - conditions: "{{ button == '001' and button_action == 0 }}"
+    sequence: !input 'dot_pressed'
+  - conditions: "{{ button == '001' and button_action == 3 }}"
+    sequence: !input 'dot_pressed_double'
+  - conditions: "{{ button == '001' and button_action == 2 }}"
+    sequence: !input 'dot_pressed_long'
+  - conditions: "{{ button == '001' and button_action == 1 }}"
+    sequence: !input 'dot_pressed_long_release'
+  - conditions: "{{ button == '003' and button_action == 0 }}"
+    sequence: !input 'circle_pressed'
+  - conditions: "{{ button == '003' and button_action == 3 }}"
+    sequence: !input 'circle_pressed_double'
+  - conditions: "{{ button == '003' and button_action == 2 }}"
+    sequence: !input 'circle_pressed_long'
+  - conditions: "{{ button == '003' and button_action == 1 }}"
+    sequence: !input 'circle_pressed_long_release'
+  - conditions: "{{ button == '004' and button_action == 0 }}"
+    sequence: !input 'minus_pressed'
+  - conditions: "{{ button == '004' and button_action == 3 }}"
+    sequence: !input 'minus_pressed_double'
+  - conditions: "{{ button == '004' and button_action == 2 }}"
+    sequence: !input 'minus_pressed_long'
+  - conditions: "{{ button == '004' and button_action == 1 }}"
+    sequence: !input 'minus_pressed_long_release'
+  - conditions: "{{ button == '002' and button_action == 0 }}"
+    sequence: !input 'plus_pressed'
+  - conditions: "{{ button == '002' and button_action == 3 }}"
+    sequence: !input 'plus_pressed_double'
+  - conditions: "{{ button == '002' and button_action == 2 }}"
+    sequence: !input 'plus_pressed_long'
+  - conditions: "{{ button == '002' and button_action == 1 }}"
+    sequence: !input 'plus_pressed_long_release'
+  default:
+    - service: logbook.log
+      data:
+        name: Nodon Soft Remote
+        message: Unhandled event
