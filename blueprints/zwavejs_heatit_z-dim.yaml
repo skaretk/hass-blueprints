@@ -10,14 +10,14 @@ blueprint:
       selector:
         device:
           integration: zwave_js
-          manufacturer: ThermoFloor
-          model: HeatIt ZDim
+          manufacturer: Heatit
+          model: Z-Dim
     double_press:
       name: Button Pressed 2 times
       description: Action to run on button is pressed twice.
       default:
       selector:
-        action: {}      
+        action: {}
     triple_press:
       name: Button Pressed 3 times
       description: Action to run on button is pressed three times.
