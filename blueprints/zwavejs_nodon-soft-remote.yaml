@@ -1,12 +1,15 @@
 blueprint:
   name: Nodon Soft Remote
-  description: This blueprint can be used for creation of a single automatization
-    for controlling whole Nodon Soft Remote.
+  description: This blueprint can be used for creation of a single automation
+    for controlling a whole Nodon Soft Remote.
   domain: automation
+  source_url: https://github.com/skaretk/hass-blueprints/blob/main/blueprints/zwavejs_nodon-soft-remote.yaml
+  homeassistant:
+    min_version: 2024.10.0
   input:
     nodon_soft_remote:
       name: Nodon Soft Remote
-      description: The Nodon Soft Remote to interract with
+      description: The Nodon Soft Remote to interact with
       selector:
         device:
           integration: zwave_js
@@ -34,7 +37,7 @@ blueprint:
       name: Dot Long Press Release
       description: Action to run when dot button is released after long press.
       default:
-      selector:      
+      selector:
         action: {}
     circle_pressed:
       name: Circle Press
@@ -108,15 +111,16 @@ blueprint:
       default:
       selector:
         action: {}
-      
+
 mode: single
-trigger:
-- platform: event
+triggers:
+- trigger: event
   event_type: zwave_js_value_notification
   event_data:
     device_id: !input 'nodon_soft_remote'
     command_class_name: Central Scene
-action:
+
+actions:
 - variables:
     button: "{{ trigger.event.data.property_key }}"
     button_action: "{{ trigger.event.data.value }}"
@@ -154,7 +158,7 @@ action:
   - conditions: "{{ button == '002' and button_action == 1 }}"
     sequence: !input 'plus_pressed_long_release'
   default:
-    - service: logbook.log
+    - action: logbook.log
       data:
         name: Nodon Soft Remote
         message: Unhandled event
