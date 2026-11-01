@@ -1,17 +1,29 @@
 blueprint:
-  name: Heatit Z-Dim
-  description: This blueprint can be used for creation of a single automatization
-    for controlling whole Heatit Z-Dim.
+  name: Heatit Z-Dim / Z-Dim2
+  description: >-
+    This blueprint can be used for creation of a single automation
+    for controlling a whole Heatit Z-Dim or Z-Dim2.
+
+    Note: On the Z-Dim2, set parameter 6 (Rotary Wheel Press Functionality)
+    and/or parameter 7 (External Switch Functionality) to
+    "Scene controller function" to make the device send scene events.
   domain: automation
+  source_url: https://github.com/skaretk/hass-blueprints/blob/main/blueprints/zwavejs_heatit_z-dim.yaml
+  homeassistant:
+    min_version: 2024.10.0
   input:
     zdim_device_id:
-      name: Heatit Z-Dim
-      description: The Heatit Z-Dim to interract with
+      name: Heatit Z-Dim / Z-Dim2
+      description: The Heatit Z-Dim or Z-Dim2 to interact with
       selector:
         device:
-          integration: zwave_js
-          manufacturer: Heatit
-          model: Z-Dim
+          filter:
+            - integration: zwave_js
+              manufacturer: Heatit
+              model: Z-Dim
+            - integration: zwave_js
+              manufacturer: Heatit
+              model: Z-DIM2
     double_press:
       name: Button Pressed 2 times
       description: Action to run on button is pressed twice.
@@ -38,14 +50,14 @@ blueprint:
         action: {}
 
 mode: single
-trigger:
-- platform: event
+triggers:
+- trigger: event
   event_type: zwave_js_value_notification
   event_data:
     device_id: !input "zdim_device_id"
     command_class_name: Central Scene
 
-action:
+actions:
 - variables:
     button: "{{ trigger.event.data.property_key_name }}"
     button_action: "{{ trigger.event.data.value }}"
@@ -59,7 +71,7 @@ action:
   - conditions: "{{ button == '001' and button_action == 'KeyPressed5x' }}"
     sequence: !input "five_press"
   default:
-    - service: logbook.log
+    - action: logbook.log
       data:
-        name: Heatit Z-Dim
+        name: Heatit Z-Dim / Z-Dim2
         message: Unhandled event
